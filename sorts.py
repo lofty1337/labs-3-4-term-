@@ -1,8 +1,8 @@
 from random import randint
 
 
-def combSort(list): # №4 Сортировка методом прочесывания
-    n = len(list)
+def combSort(array): # №4 Сортировка методом прочесывания
+    n = len(array)
     factor = 1.3
     step = n
     while step > 1 or q:
@@ -10,82 +10,82 @@ def combSort(list): # №4 Сортировка методом прочесыв�
             step = int(step // factor)
         q, i = False, 0
         while i + step < n:
-            if list[i] > list[i + step]:
-                list[i], list[i + step] = list[i + step], list[i]
+            if array[i] > array[i + step]:
+                array[i], array[i + step] = array[i + step], array[i]
                 q = True
             i += step
-    print(list)
+    print(array)
 
 
-def insertionSort(list): # №5 Вставками
-    for i in range(len(list)):
+def insertionSort(array): # №5 Вставками
+    for i in range(len(array)):
         j = i - 1
-        key = list[i]
-        while list[j] > key and j >= 0:
-            list[j+1] = list[j]
+        key = array[i]
+        while array[j] > key and j >= 0:
+            array[j+1] = array[j]
             j -= 1
-        list[j+1] = key
-    print(list)
+        array[j+1] = key
+    print(array)
 
 
-def selectionSort(list): # №6 Посредством выбора
-    for i in range(len(list)-1):
-        for j in range(i+1, len(list)):
-            if list[j]<list[i]:
-                list[i],list[j]=list[j],list[i]
-    print(list)
+def selectionSort(array): # №6 Посредством выбора
+    for i in range(len(array)-1):
+        for j in range(i+1, len(array)):
+            if array[j]<array[i]:
+                array[i],array[j]=array[j],array[i]
+    print(array)
 
 
-def shellSort(list): # №7 Шелла
-    length = len(list)
+def shellSort(array): # №7 Шелла
+    length = len(array)
     step = length//2
     while step>0:
         for i in range(step, length, 1):
             j = i
             k = j - step
-            while k >= 0 and list[k] > list[j]:
-                list[k],list[j]=list[j],list[k]
+            while k >= 0 and array[k] > array[j]:
+                array[k],array[j]=array[j],array[k]
                 j = k
                 k = j - step
         step//=2
-    print(list)
+    print(array)
 
 
-def radixSort(list): # №8 Поразрядная
-    length = len(str(max(list)))
+def radixSort(array): # №8 Поразрядная
+    length = len(str(max(array)))
     rang = 10
     for i in range(length):
         ranks = [[] for j in range(rang)]
-        for k in list:
+        for k in array:
             num = k // 10**i % 10
             ranks[num].append(k)
-        list = []
+        array = []
         for j in range(rang):
-            list = list + ranks[j]
-    print(list)
+            array = array + ranks[j]
+    print(array)
 
 
-def heapify(list, n, i): # №9 Пирамидальная (heap sort)
+def heapify(array, n, i): # №9 Пирамидальная (heap sort)
     largest = i
     l = 2 * i + 1
     r = 2 * i + 2
-    if l < n and list[i] < list[l]:
+    if l < n and array[i] < array[l]:
         largest = l
-    if r < n and list[largest] < list[r]:
+    if r < n and array[largest] < array[r]:
         largest = r
     if largest != i:
-        list[i], list[largest] = list[largest], list[i]
-        heapify(list, n, largest)
+        array[i], array[largest] = array[largest], array[i]
+        heapify(array, n, largest)
 
 
-def heapSort(list):
-    n = len(list)
+def heapSort(array):
+    n = len(array)
     for i in range(n // 2, -1, -1):
-        heapify(list, n, i)
+        heapify(array, n, i)
     for i in range(n - 1, 0, -1):
-        list[i], list[0] = list[0], list[i]
-        heapify(list, i, 0)
-    print(list)
+        array[i], array[0] = array[0], array[i]
+        heapify(array, i, 0)
+    print(array)
 
 
 def mergeSort(A): # №10 Слиянием
@@ -116,18 +116,46 @@ def mergeSort(A): # №10 Слиянием
     return A
 
 
-list = [randint(1, 100) for a in range(100)]
-combSort(list)
-list = [randint(1, 100) for a in range(100)]
-insertionSort(list)
-list = [randint(1, 100) for a in range(100)]
-selectionSort(list)
-list = [randint(1, 100) for a in range(100)]
-shellSort(list)
-list = [randint(1, 100) for a in range(100)]
-radixSort(list)
-list = [randint(1, 100) for a in range(100)]
-heapSort(list)
-list = [randint(1, 100) for a in range(100)]
-mergeSort(list)
-print(list)
+def partition(array, start, end): # №11 Быстрая
+    pivot = array[start]
+    low = start + 1
+    high = end
+    while True:
+        while low <= high and array[high] >= pivot:
+            high = high - 1
+        while low <= high and array[low] <= pivot:
+            low = low + 1
+        if low <= high:
+            array[low], array[high] = array[high], array[low]
+        else:
+            break
+    array[start], array[high] = array[high], array[start]
+    return high
+
+
+def quickSort(array, start, end):
+    if start >= end:
+        return
+    p = partition(array, start, end)
+    quickSort(array, start, p-1)
+    quickSort(array, p+1, end)
+
+
+array = [randint(1, 100) for a in range(100)]
+combSort(array)
+array = [randint(1, 100) for a in range(100)]
+insertionSort(array)
+array = [randint(1, 100) for a in range(100)]
+selectionSort(array)
+array = [randint(1, 100) for a in range(100)]
+shellSort(array)
+array = [randint(1, 100) for a in range(100)]
+radixSort(array)
+array = [randint(1, 100) for a in range(100)]
+heapSort(array)
+array = [randint(1, 100) for a in range(100)]
+mergeSort(array)
+print(array)
+array = [randint(1, 100) for a in range(100)]
+quickSort(array,0,len(array)-1)
+print(array)
