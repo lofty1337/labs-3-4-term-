@@ -1,77 +1,126 @@
-import re
-# Приоритет операций-символов
-expressions=['+','-','*','/']
 def op_prior(o):
     if o == '*':
-        return 3
+        return 2
     elif o == '/':
         return 2
     elif o == '+':
         return 1
     elif o == '-':
         return 1
+    elif o == '(':
+        return 0
 
 
-def opn(expr):  # входной параметр -инфиксная строка арифметического выражения
-    co = []  # выходная строка
-    op_steck = []  # стек операторов
-    list_tokens = expr
-    print(list_tokens)
-    for i in list_tokens:  # цикл по списку- i елемент число,() или знак операции
-        if i.isdigit():  # i-число
-            co.append(int(i))  # в стек
-        elif i in ['*', '/', '%', '+', '-']:  # i -бинарная операция
-            token_tmp = ''  # смотрим на вверх стека
-            if len(op_steck) > 0:
-                token_tmp = op_steck[len(op_steck) - 1]  # смотрим на вверх стека
-                while (len(op_steck) > 0 and token_tmp != '('):  # пока стек >0
-                    if (op_prior(i) <= op_prior(token_tmp)):  # сравнием приоритет токена в строке и приоритет операци  в стеке операций
-                        co.append(op_steck.pop())  # если в стеке операция выше,то выталкиваем его в выходную строку
-                    else:  # bиначе выходим из данного цикла
+def rpn(s):
+    lex = parse(s)
+    s2 = []
+    r = []
+    oper = ["+", "-", "*", "/", "(", ")"]
+    for a in lex:
+        if a == "(":
+            s2 = [a] + s2
+        elif a in oper:
+            if s2 == []:
+                s2 = [a]
+            elif a == ")":
+                while (True):
+                    q = s2[0]
+                    s2 = s2[1:]
+                    if q == "(":
                         break
-            op_steck.append(i)  # тогда выйдя из цикла,добавим операцию в стек
-        elif i == '(':  # открывающая (
-            op_steck.append(i)  # в стек
-        elif i == ')':  # закрывающая )
-            token_tmp = op_steck[len(op_steck) - 1]  # смотрим на вверх стека
-            while (token_tmp != '('):  # пока не всретим открывающию скобку
-                co.append(
-                    op_steck.pop())  # выталкиваем операторы в выходную строку-раз мы работаем с группированием чисел-со скобками
-                token_tmp = op_steck[len(op_steck) - 1]  # смотрим на вверх стека внутри цикла
-                if len(op_steck) == 0:
-                    raise RuntimeError('V virajenii propushena (')
-                if token_tmp == '(':
-                    op_steck.pop()
-
-    while (len(op_steck) > 0):  # мы должны вытолкнуть оставшиеся операторы
-        token_tmp = op_steck[len(op_steck) - 1]
-        co.append(op_steck.pop())
-        if token_tmp == '(':
-            raise RuntimeError('V virajenii propushena )')
-    return co  # вернем постфиксную запись
-
-res=1
-expr = input()
-co = opn(expr)
-i=0
-while len(co)>1:
-    tmp = co
-    if co[i] in expressions:
-        if co[i]=='+':
-            res = co[i-2] + co[i-1]
-        elif co[i]=='-':
-            res = co[i-2] - co[i-1]
-        elif co[i] == '*':
-            res = co[i - 2] * co[i - 1]
-        elif co[i] == '/':
-            if co[i - 1]!=0:
-                res = co[i - 2] / co[i - 1]
+                    r += [q]
+            elif op_prior(s2[0]) < op_prior(a):
+                s2 = [a] + s2
             else:
-                raise RuntimeError('/0!')
-        co = co[0:i-2]
-        co.append(res)
-        co.extend(tmp[i+1:])
-        i=0
-    else:
-        i+=1
-print(co) #2+7*(3/9)-5
+                while (True):
+                    if s2 == []:
+                        break
+                    q = s2[0]
+                    if op_prior(q) < op_prior(a):
+                        break
+                    r += [q]
+                    s2 = s2[1:]
+                s2 = [a] + s2
+        else:
+            r += [a]
+    while (s2 != []):
+        q = s2[0]
+        r += [q]
+        s2 = s2[1:]
+    print(r)
+    return r
+
+
+def parse(s):
+    delims = ["+", "-", "*", "/", "(", ")"]
+    lex = []
+    tmp = ""
+    for a in s:
+        if a != " ":
+            if a in delims:
+                if tmp != "":
+                    lex += [tmp]
+                lex += [a]
+                tmp = ""
+            else:
+                tmp += a
+    if tmp != "":
+        lex += [tmp]
+    return lex
+
+
+def calc(formula):
+    s = []
+    for lex in formula:
+        if lex[0].isdigit():
+            s.append(float(lex))
+        else:
+            a2 = s.pop()
+            a1 = s.pop()
+            if lex == '+':
+                s.append(a1 + a2)
+            if lex == '-':
+                s.append(a1 - a2)
+            if lex == '*':
+                s.append(a1 * a2)
+            if lex == '/':
+                if a2 == 0:
+                    raise RuntimeError('/0!')
+                else:
+                    s.append(a1 / a2)
+    return s.pop()
+
+
+def bracket_check(s):
+    str=''
+    for i in s:
+        if i=='(' or i==')':
+            str+=i
+    list = []
+    wrongStr = 0
+    for i in str:
+        if i == '(' or i == '{' or i == '[':
+            list.append(i)
+        else:
+            if list == []:
+                return 0
+            else:
+                if i == ']':
+                    if list[-1] == '[':
+                        list.pop()
+                elif i == ')':
+                    if list[-1] == '(':
+                        list.pop()
+                elif i == '}':
+                    if list[-1] == '{':
+                        list.pop()
+    if wrongStr == 0:
+        if list == []:
+            return 1
+        else:
+            return 0
+expression = input()
+if bracket_check(expression):
+    print(calc(rpn(expression)))
+else:
+    print("Неверная скобочная последовательность")
