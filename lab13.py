@@ -44,11 +44,11 @@ class HashTable():
 
 
     def searchItem(self, data):
-        key_val = 0
+        keyVal = 0
         for i in data:
-            key_val += ord(i)
+            keyVal += ord(i)
 
-        index = self.hashFunction(key_val)
+        index = self.hashFunction(keyVal)
         count, i = 0, 0
         while True:
             if (not (self.table[index + i])):
