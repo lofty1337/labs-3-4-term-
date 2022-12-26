@@ -1,11 +1,10 @@
 # Хеш-таблица с наложением
 class HashTable():
     def __init__(self, size=10):
-        self.A = 0.618033  # Золотое сечение – такое деление величины на две части,
-        self.N = 13        # при котором отношение большей части к меньшей равно отношению всей величины к ее большей части.
-        self.capacity = self.getPrime(size)  # размер хеш-таблицы
+
+        self.capacity = self.getPrime(size)
         self.table = {key: None for key in range(self.capacity)}
-        self.keys = []  # список ключей
+        self.keys = []
 
     def checkPrime(self, n):
         if (n == 1 or n == 0):
@@ -22,18 +21,11 @@ class HashTable():
             n += 1
         return n
 
-    def hashFunctionMod(self, key):
+    def hashFunction(self, key):
         return key % self.capacity
 
-    def hashFunctionComb(self, key):
-        return self.N * ((key * self.A) % 1)
-
-    def hashFunctionPowered(self, key):
-        return (self.hashFunctionMod(key) + self.hashFunctionComb(key)) // 1
-
-
     def insertItem(self, key, data):
-        index = self.hashFunctionPowered(key)
+        index = self.hashFunction(key)
         if (not self.table[index]):
             self.keys.append(index)
         else:
@@ -46,7 +38,7 @@ class HashTable():
                 i += 1
         self.table[index] = data
 
-    def printHash(self):
+    def printTable(self):
         for key in self.keys:
             print(f'{key} {self.table[key]}')
 
@@ -56,7 +48,7 @@ class HashTable():
         for i in data:
             key_val += ord(i)
 
-        index = self.hashFunctionPowered(key_val)
+        index = self.hashFunction(key_val)
         count, i = 0, 0
         while True:
             if (not (self.table[index + i])):
@@ -79,4 +71,4 @@ for word in s:
     keyVal = 0
 
 print(table.searchItem('zxc'))
-table.printHash()
+table.printTable()
