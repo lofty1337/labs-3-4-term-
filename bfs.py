@@ -1,24 +1,31 @@
-A = [
-    [1,3], # 0
-    [0,3,4,5], # 1
-    [4,5], # 2
-    [0,1,5], # 3
-    [1,2], # 4
-    [1,2,3] # 5
-]   #матрица смежности
+from collections import deque
 
-d = [-1] * len(A)
-
-def bfs(s):
-    global d
-    d[s] = 0
-    q = [s]
+def bfs(A, s, d):
+    q = deque([s])
+    d[s] = True
+    component = [s]
     while q:
-        v = q.pop(0)
+        v = q.popleft()
         for u in A[v]:
-            if d[u] == -1:#проверка на посещенность
+            if not d[u]:
+                d[u] = True
+                component.append(u)
                 q.append(u)
-                d[u] = d[v] + 1
+    return component
 
-bfs(0)
-print(d)
+def find_components(graph):
+    n = len(graph)
+    d = [False] * n
+    components = []
+    for v in range(n):
+        if not d[v]:
+            component = bfs(graph, v, d)
+            components.append(component)
+    return components
+
+# Пример использования
+graph = [[1, 2], [0], [0], [4], [3]]
+components = find_components(graph)
+print(f"Количество компонент связности: {len(components)}")
+for i, component in enumerate(components):
+    print(f"Компонента {i+1}: {component}")
