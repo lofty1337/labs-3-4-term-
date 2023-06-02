@@ -1,40 +1,37 @@
-def find_eulerian_cycle(graph):
-    num_vertices = len(graph)
-    cycle = []
-    stack = []
-    current_vertex = 0  # Начинаем с вершины 0
+def find_eulerian_cycle(adjacency_matrix):
+    n = len(adjacency_matrix)
+    stack = [0]  # Стек для обхода
+    path = []  # Результирующий путь
 
-    while True:
-        cycle.append(current_vertex)
-        # Поиск непосещенных смежных вершин
-        unvisited_neighbors = [neighbor for neighbor in range(num_vertices) if graph[current_vertex][neighbor] > 0]
+    while stack:
+        v = stack[-1]  # Вершина из стека
+        has_unvisited_neighbour = False
 
-        if unvisited_neighbors:
-            # Добавляем текущую вершину в стек и выбираем случайного смежного непосещенного соседа
-            stack.append(current_vertex)
-            next_vertex = unvisited_neighbors[0]
+        for u in range(n):
+            if adjacency_matrix[v][u] > 0:
+                stack.append(u)  # Добавляем смежную вершину в стек
+                adjacency_matrix[v][u] -= 1  # Удаляем ребро из матрицы смежности
+                adjacency_matrix[u][v] -= 1
+                has_unvisited_neighbour = True
+                break
 
-            # Удаляем ребро между текущей вершиной и выбранной вершиной
-            graph[current_vertex][next_vertex] -= 1
-            graph[next_vertex][current_vertex] -= 1
+        if not has_unvisited_neighbour:
+            path.append(stack.pop())  # Добавляем вершину в результирующий путь
 
-            # Переходим к выбранной вершине
-            current_vertex = next_vertex
-        elif stack:
-            # Если у текущей вершины нет непосещенных смежных вершин, возвращаемся к предыдущей вершине из стека
-            current_vertex = stack.pop()
-        else:
-            # Если стек пуст, завершаем цикл
-            break
+    return path[::-1]  # Инвертируем путь для получения эйлерова цикла
 
-    return cycle
-# Пример графа, заданного матрицей смежности
+
 adjacency_matrix = [
-    [0, 1, 1, 0],
-    [1, 0, 1, 1],
-    [1, 1, 0, 1],
-    [0, 1, 1, 0]
+    [0, 1, 0, 1, 0],
+    [1, 0, 1, 1, 1],
+    [0, 1, 0, 1, 0],
+    [1, 1, 1, 0, 1],
+    [0, 1, 0, 1, 0]
 ]
 
 eulerian_cycle = find_eulerian_cycle(adjacency_matrix)
-print("Эйлеров цикл:", eulerian_cycle)
+
+if eulerian_cycle is not None:
+    print("Эйлеров цикл:", eulerian_cycle)
+else:
+    print("Граф не содержит эйлерова цикла.")
