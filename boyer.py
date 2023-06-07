@@ -1,86 +1,44 @@
-def generate_bad_character_table(pattern):
-    table = {}
-    m = len(pattern)
+def boyer_moore_horspool_search(pattern, text):
+    pattern_length = len(pattern)
+    text_length = len(text)
 
-    for i in range(m - 1):
-        table[pattern[i]] = m - i - 1
+    if pattern_length > text_length:
+        return -1
 
-    return table
+    skip_table = create_skip_table(pattern)
 
-
-def generate_good_suffix_table(pattern):
-    table = []
-    m = len(pattern)
-    last_prefix_position = m
-
-    for i in range(m - 1, -1, -1):
-        if is_prefix(pattern, i + 1):
-            last_prefix_position = i + 1
-
-        table.append(last_prefix_position - i + m - 1)
-
-    for i in range(0, m - 1):
-        length = suffix_length(pattern, i)
-        table[length] = m - 1 - i + length
-
-    return table
-
-
-def is_prefix(pattern, p):
-    m = len(pattern)
-
-    for i in range(p, m):
-        if pattern[i] != pattern[i - p]:
-            return False
-
-    return True
-
-
-def suffix_length(pattern, p):
-    m = len(pattern)
-    length = 0
-
-    while p >= 0 and pattern[p] == pattern[m - 1 - length]:
-        length += 1
-        p -= 1
-
-    return length
-
-
-def search(pattern, text):
-    n = len(text)
-    m = len(pattern)
-    bad_character_table = generate_bad_character_table(pattern)
-    good_suffix_table = generate_good_suffix_table(pattern)
-    result = []
-
-    i = 0
-    while i <= n - m:
-        j = m - 1
-
-        while j >= 0 and pattern[j] == text[i + j]:
+    i = pattern_length - 1
+    while i < text_length:
+        j = pattern_length - 1
+        while j >= 0 and text[i] == pattern[j]:
+            i -= 1
             j -= 1
 
-        if j < 0:
-            result.append(i)
-            i += good_suffix_table[0]
-        else:
-            bad_character_shift = bad_character_table.get(text[i + j], m)
-            good_suffix_shift = good_suffix_table[j]
+        if j == -1:
+            return i + 1
 
-            i += max(bad_character_shift, good_suffix_shift)
+        i += skip_table.get(text[i], pattern_length)
 
-    return result
+    return -1
+
+
+def create_skip_table(pattern):
+    skip_table = {}
+
+    pattern_length = len(pattern)
+    for i in range(pattern_length - 1):
+        skip_table[pattern[i]] = pattern_length - 1 - i
+
+    return skip_table
 
 
 # Пример использования
 text = "ABACADABRAC"
 pattern = "ABRA"
 
-matches = search(pattern, text)
+index = boyer_moore_horspool_search(pattern, text)
 
-if len(matches) > 0:
-    print("Образец найден в следующих позициях:")
-    print(matches)
+if index != -1:
+    print("Образец найден в позиции:", index)
 else:
     print("Образец не найден")
