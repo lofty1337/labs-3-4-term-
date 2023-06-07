@@ -5,6 +5,7 @@ def boyer_moore_horspool_search(pattern, text):
     if pattern_length > text_length:
         return -1
 
+    # Создание таблицы пропуска
     skip_table = create_skip_table(pattern)
 
     i = pattern_length - 1
@@ -15,10 +16,14 @@ def boyer_moore_horspool_search(pattern, text):
             j -= 1
 
         if j == -1:
+            # Образец найден
             return i + 1
 
-        i += skip_table.get(text[i], pattern_length)
+        # Вычисление смещения по таблице пропуска
+        skip = skip_table.get(text[i], pattern_length)
+        i += skip
 
+    # Образец не найден
     return -1
 
 
@@ -27,6 +32,7 @@ def create_skip_table(pattern):
 
     pattern_length = len(pattern)
     for i in range(pattern_length - 1):
+        # Вычисление смещения для каждого символа образца
         skip_table[pattern[i]] = pattern_length - 1 - i
 
     return skip_table
