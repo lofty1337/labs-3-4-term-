@@ -1,37 +1,51 @@
 def find_eulerian_cycle(adjacency_matrix):
-    n = len(adjacency_matrix)
-    stack = [0]  # Стек для обхода
-    path = []  # Результирующий путь
+    num_vertices = len(adjacency_matrix)
+    eulerian_cycle = []
 
-    while stack:
-        v = stack[-1]  # Вершина из стека
-        has_unvisited_neighbour = False
+    def dfs(vertex):
+        for neighbor in range(num_vertices):
+            if adjacency_matrix[vertex][neighbor] > 0:
+                adjacency_matrix[vertex][neighbor] -= 1
+                adjacency_matrix[neighbor][vertex] -= 1
+                dfs(neighbor)
 
-        for u in range(n):
-            if adjacency_matrix[v][u] > 0:
-                stack.append(u)  # Добавляем смежную вершину в стек
-                adjacency_matrix[v][u] -= 1  # Удаляем ребро из матрицы смежности
-                adjacency_matrix[u][v] -= 1
-                has_unvisited_neighbour = True
-                break
+        eulerian_cycle.append(vertex)
 
-        if not has_unvisited_neighbour:
-            path.append(stack.pop())  # Добавляем вершину в результирующий путь
+    dfs(0)
 
-    return path[::-1]  # Инвертируем путь для получения эйлерова цикла
+    if len(eulerian_cycle) != num_vertices + 1:
+        return []
+
+    return eulerian_cycle[::-1]
 
 
+# Пример использования
 adjacency_matrix = [
-    [0, 1, 0, 1, 0],
-    [1, 0, 1, 1, 1],
-    [0, 1, 0, 1, 0],
-    [1, 1, 1, 0, 1],
-    [0, 1, 0, 1, 0]
+    [0, 1, 1, 1, 0],
+    [1, 0, 1, 0, 1],
+    [1, 1, 0, 1, 1],
+    [1, 0, 1, 0, 1],
+    [0, 1, 1, 1, 0]
 ]
 
 eulerian_cycle = find_eulerian_cycle(adjacency_matrix)
 
-if eulerian_cycle is not None:
-    print("Эйлеров цикл:", eulerian_cycle)
+if eulerian_cycle:
+    print("Эйлеров цикл найден:")
+    print(eulerian_cycle)
 else:
-    print("Граф не содержит эйлерова цикла.")
+    print("Эйлеров цикл не найден")
+adjacency_matrix = [
+    [0, 1, 1, 0],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [0, 1, 1, 0]
+]
+
+eulerian_cycle = find_eulerian_cycle(adjacency_matrix)
+
+if eulerian_cycle:
+    print("Эйлеров цикл найден:")
+    print(eulerian_cycle)
+else:
+    print("Эйлеров цикл не найден")
